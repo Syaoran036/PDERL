@@ -1,13 +1,9 @@
-[![Build Status](https://travis-ci.com/crisbodnar/pderl.svg?branch=master)](https://travis-ci.com/crisbodnar/pderl)
 
-# Proximal Distilled Evolutionary Reinforcement Learning
+## Proximal Distilled Evolutionary Reinforcement Learning ##
 
-Official code for the AAAI 2020 paper "Proximal Distilled Evolutionary Reinforcement Learning". 
+This is modified version for PDERL algorithm.
 
-![PDERL](figures/pderl_gif.gif) 
-
-Use the following to cite:
-
+#### original repo: https://github.com/crisbodnar/pderl
 ```
 @inproceedings{bodnar2020proximal,
   title={Proximal distilled evolutionary reinforcement learning},
@@ -20,10 +16,17 @@ Use the following to cite:
 }
 ```
 
-#### To Run PDERL #### 
+#### UPDATE LOG ###
+- update dependency gym to gymnasium
 
-First, you will have to install all the dependencies by running ```pip install -r requirements.txt```.
-Additionally, for installing mujoco-py 2.0.2.2, follow the instructions on the [official github](https://github.com/openai/mujoco-py). 
+
+#### Run PDERL #### 
+
+install dependencies:
+
+```
+pip install -r requirements.txt
+```
 
 To run PDERL with proximal mutations and distillation-based crossover use:
 
@@ -39,14 +42,4 @@ python play_pderl.py -env=$ENV_NAME$ -model_path=$MODEL_PATH$ -render
 
 #### ENVS TESTED #### 
 
-'Hopper-v2' \
-'HalfCheetah-v2' \
-'Swimmer-v2' \
-'Ant-v2' \
-'Walker2d-v2' 
-
-#### CREDITS ####
-
-Our code is largely based on the [code of Khadka and Tumer](https://github.com/ShawK91/erl_paper_nips18) and we would 
-like to thank them for making their code publicly available. The proximal mutations code is also relying on 
-the [safe mutations code](https://github.com/uber-research/safemutations) of Lehman et al. from Uber Research.
+'Hopper-v4' \
