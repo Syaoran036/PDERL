@@ -1,12 +1,12 @@
 import random
 import numpy as np
-from core.ddpg import GeneticAgent, hard_update
+from pderl.ddpg import GeneticAgent, hard_update
 from typing import List
-from core import replay_memory
+from pderl import replay_memory
 import fastrand, math
 import torch
 import torch.distributions as dist
-from core.mod_utils import is_lnorm_key
+from pderl.mod_utils import is_lnorm_key
 from parameters import Parameters
 import os
 

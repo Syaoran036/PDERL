@@ -3,8 +3,8 @@ import torch.nn as nn
 from torch.optim import Adam
 from torch.nn import functional as F
 from parameters import Parameters
-from core import replay_memory
-from core.mod_utils import is_lnorm_key
+from pderl import replay_memory
+from pderl.mod_utils import is_lnorm_key
 import numpy as np
 
 

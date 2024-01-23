@@ -2,8 +2,8 @@ import os
 import pickle
 import numpy as np
 import torch
-from core import ddpg
-from core import mod_neuro_evo
+from pderl import ddpg
+from pderl import mod_neuro_evo
 
 
 class OperatorRunner:

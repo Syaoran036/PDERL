@@ -1,11 +1,11 @@
 import numpy as np
-from core import mod_neuro_evo as utils_ne
-from core import mod_utils as utils
-from core import replay_memory
-from core import ddpg as ddpg
+from pderl import mod_neuro_evo as utils_ne
+from pderl import mod_utils as utils
+from pderl import replay_memory
+from pderl import ddpg as ddpg
 from scipy.spatial import distance
 from scipy.stats import rankdata
-from core import replay_memory
+from pderl import replay_memory
 from parameters import Parameters
 import fastrand
 import torch

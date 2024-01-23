@@ -2,7 +2,7 @@ import random
 import torch
 import numpy as np
 from collections import namedtuple
-from core import mod_utils as utils
+from pderl import mod_utils as utils
 
 # Taken and adapted from
 # https://github.com/pytorch/tutorials/blob/master/Reinforcement%20(Q-)Learning%20with%20PyTorch.ipynb

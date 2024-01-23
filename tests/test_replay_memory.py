@@ -1,4 +1,4 @@
-from core.replay_memory import ReplayMemory, Transition
+from pderl.replay_memory import ReplayMemory, Transition
 import numpy as np
 
 

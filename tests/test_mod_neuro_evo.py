@@ -1,4 +1,4 @@
-from core.mod_neuro_evo import SSNE
+from pderl.mod_neuro_evo import SSNE
 import numpy as np
 
 

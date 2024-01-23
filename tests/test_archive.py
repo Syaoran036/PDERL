@@ -1,4 +1,4 @@
-from core.agent import Archive
+from pderl.agent import Archive
 
 
 class Args:

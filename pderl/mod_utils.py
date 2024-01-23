@@ -4,8 +4,7 @@ import random, pickle
 import numpy as np
 import torch
 import os
-import gym
-
+import gymnasium as gym
 
 class Tracker:
     def __init__(self, parameters, vars_string, project_string):
