@@ -18,22 +18,24 @@ This is modified version for PDERL algorithm.
 
 #### UPDATE LOG ###
 - update dependency gym to gymnasium
-
+- update actor and critic network to transformer.
 
 #### Run PDERL #### 
 
-install dependencies:
+install dependencies in a virtual conda environment:
 
 ```
-pip install -r requirements.txt
+conda env create -f conda_env.yml
 ```
 
 To run PDERL with proximal mutations and distillation-based crossover use:
 
 ```bash
-python run_pderl.py -env=$ENV_NAME$ -distil -proximal_mut -mut_mag=$MUT_MAG$ -logdir=$LOG_DIR$
+python run_pderl.py
 ```
+
+Parameters can be changed in the `config.json` file.
 
 #### ENVS TESTED #### 
 
-'Hopper-v4' \
+'Hopper-v5' \
