@@ -10,11 +10,10 @@ from pderl.parameters import Parameters
 with open('config.json', 'r') as f:
     config = json.load(f)
 
-parser = argparse.ArgumentParser()
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 if __name__ == "__main__":
-    parameters = Parameters(parser, config['hardcoded_params'])  # 注入命令行参数和硬编码参数
+    parameters = Parameters(config)  # 注入命令行参数和硬编码参数
     tracker = utils.Tracker(parameters, ['erl'], '_score.csv')  # 初始化跟踪器
     frame_tracker = utils.Tracker(parameters, ['frame_erl'], '_score.csv')  # 初始化跟踪器
     time_tracker = utils.Tracker(parameters, ['time_erl'], '_score.csv')
@@ -22,7 +21,7 @@ if __name__ == "__main__":
     selection_tracker = utils.Tracker(parameters, ['elite', 'selected', 'discarded'], '_selection.csv')
 
     # Create Env
-    env = utils.NormalizedActions(gym.make(parameters.env_name))
+    env = utils.NormalizedActions(gym.make(parameters.env))
     parameters.action_dim = env.action_space.shape[0]
     parameters.state_dim = env.observation_space.shape[0]
 
@@ -30,14 +29,14 @@ if __name__ == "__main__":
     parameters.write_params(stdout=True)
 
     # Seed
-    env.seed(parameters.seed)
+    # env.seed(parameters.seed)
     torch.manual_seed(parameters.seed)
     np.random.seed(parameters.seed)
     random.seed(parameters.seed)
 
     # Create Agent
     pderl = agents.PDERL(parameters, env)
-    print('Running', parameters.env_name, ' State_dim:', parameters.state_dim, ' Action_dim:', parameters.action_dim)
+    print('Running', parameters.env, ' State_dim:', parameters.state_dim, ' Action_dim:', parameters.action_dim)
 
     next_save = parameters.next_save; time_start = time.time()
     while pderl.num_frames <= parameters.num_frames:

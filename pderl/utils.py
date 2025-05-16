@@ -4,13 +4,11 @@ import gymnasium as gym, torch
 import argparse
 import pickle
 import json
-from pderl.operator_runner import OperatorRunner
 from pderl.parameters import Parameters
 from pderl import replay_memory
 from torch.autograd import Variable
 import fastrand, math
 import torch.distributions as dist
-from pderl.ddpg import hard_update
 from typing import List
 from scipy.spatial import distance
 from scipy.stats import rankdata
@@ -29,7 +27,7 @@ def hard_update(target, source):
 class Tracker:
     def __init__(self, parameters, vars_string, project_string):
         self.vars_string = vars_string; self.project_string = project_string
-        self.foldername = parameters.save_foldername
+        self.foldername = parameters.logdir
         self.all_tracker = [[[],0.0,[]] for _ in vars_string] # [Id of var tracked][fitnesses, avg_fitness, csv_fitnesses]
         self.counter = 0
         self.conv_size = 10
@@ -210,114 +208,6 @@ def min_max_normalize(x):
 def is_lnorm_key(key):
     return key.startswith('lnorm')
 
-
-def main():
-    # 读取配置文件
-    with open('config.json', 'r') as f:
-        config = json.load(f)
-
-    parser = argparse.ArgumentParser()
-    for arg_name, arg_config in config['cli_args'].items():
-        if 'action' in arg_config:
-            parser.add_argument(f'-{arg_name}', help=arg_config['help'], action=arg_config['action'])
-        else:
-            parser.add_argument(f'-{arg_name}', help=arg_config['help'], type=eval(arg_config['type']), default=arg_config.get('default'))
-
-    ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-
-    if __name__ == "__main__":
-        parameters = Parameters(parser, config['hardcoded_params'])  # 注入命令行参数和硬编码参数
-        tracker = Tracker(parameters, ['erl'], '_score.csv')  # 初始化跟踪器
-        frame_tracker = Tracker(parameters, ['frame_erl'], '_score.csv')  # 初始化跟踪器
-        time_tracker = Tracker(parameters, ['time_erl'], '_score.csv')
-        ddpg_tracker = Tracker(parameters, ['ddpg'], '_score.csv')
-        selection_tracker = Tracker(parameters, ['elite', 'selected', 'discarded'], '_selection.csv')
-
-        # Create Env
-        env = utils.NormalizedActions(gym.make(parameters.env_name))
-        parameters.action_dim = env.action_space.shape[0]
-        parameters.state_dim = env.observation_space.shape[0]
-
-        # Write the parameters to a the info file and print them
-        parameters.write_params(stdout=True)
-
-        # Seed
-        env.seed(parameters.seed)
-        torch.manual_seed(parameters.seed)
-        np.random.seed(parameters.seed)
-        random.seed(parameters.seed)
-
-        # Tests the variation operators after that is saved first with -save_periodic
-        # 移除 test_operators 相关逻辑
-        # if parameters.test_operators:
-        #     operator_runner = OperatorRunner(parameters, env)
-        #     operator_runner.run()
-        #     exit()
-
-        # Create Agent
-        from agent_related import Agent
-        from ddpg_ssne import DDPG, SSNE
-        agent = Agent(parameters, env)
-        agent.rl_agent = DDPG(parameters)
-        agent.ounoise = None  # 需根据实际情况补充
-        agent.evolver = SSNE(parameters, agent.rl_agent.critic, agent.evaluate)
-
-        print('Running', parameters.env_name, ' State_dim:', parameters.state_dim, ' Action_dim:', parameters.action_dim)
-
-        next_save = parameters.next_save; time_start = time.time()
-        while agent.num_frames <= parameters.num_frames:
-            stats = agent.train()
-            best_train_fitness = stats['best_train_fitness']
-            erl_score = stats['test_score']
-            elite_index = stats['elite_index']
-            ddpg_reward = stats['ddpg_reward']
-            policy_gradient_loss = stats['pg_loss']
-            behaviour_cloning_loss = stats['bc_loss']
-            population_novelty = stats['pop_novelty']
-
-            print('#Games:', agent.num_games, '#Frames:', agent.num_frames,
-                  ' Train_Max:', '%.2f'%best_train_fitness if best_train_fitness is not None else None,
-                  ' Test_Score:','%.2f'%erl_score if erl_score is not None else None,
-                  ' Avg:','%.2f'%tracker.all_tracker[0][1],
-                  ' ENV:  '+ parameters.env_name,
-                  ' DDPG Reward:', '%.2f'%ddpg_reward,
-                  ' PG Loss:', '%.4f' % policy_gradient_loss)
-
-            elite = agent.evolver.selection_stats['elite']/agent.evolver.selection_stats['total']
-            selected = agent.evolver.selection_stats['selected'] / agent.evolver.selection_stats['total']
-            discarded = agent.evolver.selection_stats['discarded'] / agent.evolver.selection_stats['total']
-
-            print()
-            tracker.update([erl_score], agent.num_games)
-            frame_tracker.update([erl_score], agent.num_frames)
-            time_tracker.update([erl_score], time.time()-time_start)
-            ddpg_tracker.update([ddpg_reward], agent.num_frames)
-            selection_tracker.update([elite, selected, discarded], agent.num_frames)
-
-            # Save Policy
-            if agent.num_games > next_save:
-                next_save += parameters.next_save
-                if elite_index is not None:
-                    torch.save(agent.pop[elite_index].actor.state_dict(), os.path.join(parameters.save_foldername,
-                                                                                       'evo_net.pkl'))
-
-                    if parameters.save_periodic:
-                        save_folder = os.path.join(parameters.save_foldername, 'models')
-                        if not os.path.exists(save_folder):
-                            os.makedirs(save_folder)
-
-                        actor_save_name = os.path.join(save_folder, 'evo_net_actor_{}.pkl'.format(next_save))
-                        critic_save_name = os.path.join(save_folder, 'evo_net_critic_{}.pkl'.format(next_save))
-                        buffer_save_name = os.path.join(save_folder, 'champion_buffer_{}.pkl'.format(next_save))
-
-                        torch.save(agent.pop[elite_index].actor.state_dict(), actor_save_name)
-                        torch.save(agent.rl_agent.critic.state_dict(), critic_save_name)
-                        with open(buffer_save_name, 'wb+') as buffer_file:
-                            pickle.dump(agent.rl_agent.buffer, buffer_file)
-
-                print("Progress Saved")
-
-
 class Archive:
     """A record of past behaviour characterisations (BC) in the population"""
 
@@ -337,7 +227,3 @@ class Archive:
         distances = np.ravel(distance.cdist(np.expand_dims(this_bc, axis=0), np.array(self.bcs), metric='sqeuclidean'))
         distances = np.sort(distances)
         return distances[:self.args.ns_k].mean()
-
-
-if __name__ == "__main__":
-    main()
