@@ -1,28 +1,64 @@
-import numpy as np, os, time, random
-from pderl import utils as utils
-import gymnasium as gym, torch
-import argparse
+import numpy as np, os, random
+import torch
 import pickle
-import json
-from pderl.parameters import Parameters
-from pderl import replay_memory
 from torch.autograd import Variable
-import fastrand, math
-import torch.distributions as dist
-from typing import List
-from scipy.spatial import distance
-from scipy.stats import rankdata
-
+import gymnasium as gym
 
 def soft_update(target, source, tau):
     for target_param, param in zip(target.parameters(), source.parameters()):
         target_param.data.copy_(target_param.data * (1.0 - tau) + param.data * tau)
 
-
 def hard_update(target, source):
     for target_param, param in zip(target.parameters(), source.parameters()):
         target_param.data.copy_(param.data)
 
+def unsqueeze(array, axis=1):
+    if axis == 0: return np.reshape(array, (1, len(array)))
+    elif axis == 1: return np.reshape(array, (len(array), 1))
+
+def fanin_init(size, fanin=None):
+    v = 0.008
+    return torch.Tensor(size).uniform_(-v, v)
+
+def actfn_none(inp): return inp
+
+def fanin_init(size, fanin=None):
+    fanin = fanin or size[0]
+    #v = 1. / np.sqrt(fanin)
+    v = 0.008
+    return torch.Tensor(size).uniform_(-v, v)
+
+def to_numpy(var):
+    return var.data.numpy()
+
+def to_tensor(ndarray, volatile=False, requires_grad=False):
+    return Variable(torch.from_numpy(ndarray).float(), volatile=volatile, requires_grad=requires_grad)
+
+def pickle_obj(filename, object):
+    handle = open(filename, "wb")
+    pickle.dump(object, handle)
+
+def unpickle_obj(filename):
+    with open(filename, 'rb') as f:
+        return pickle.load(f)
+
+def odict_to_numpy(odict):
+    l = list(odict.values())
+    state = l[0]
+    for i in range(1, len(l)):
+        if isinstance(l[i], np.ndarray):
+            state = np.concatenate((state, l[i]))
+        else: #Floats
+            state = np.concatenate((state, np.array([l[i]])))
+    return state
+
+def min_max_normalize(x):
+    min_x = np.min(x)
+    max_x = np.max(x)
+    return (x - min_x) / (max_x - min_x)
+
+def is_lnorm_key(key):
+    return key.startswith('lnorm')
 
 class Tracker:
     def __init__(self, parameters, vars_string, project_string):
@@ -59,40 +95,6 @@ class Tracker:
                 except:
                     # Common error showing up in the cluster for unknown reasons
                     print('Failed to save progress')
-
-
-class Memory:   # stored as ( s, a, r, s_ ) in SumTree
-    e = 0.01
-    a = 0.6
-
-    def __init__(self, capacity):
-        self.tree = SumTree(capacity)
-
-    def _getPriority(self, error):
-        return (error + self.e) ** self.a
-
-    def add(self, error, sample):
-        p = self._getPriority(error)
-        self.tree.add(p, sample)
-
-    def sample(self, n):
-        batch = []
-        segment = self.tree.total() / n
-
-        for i in range(n):
-            a = segment * i
-            b = segment * (i + 1)
-
-            s = random.uniform(a, b)
-            (idx, p, data) = self.tree.get(s)
-            batch.append( (idx, data) )
-
-        return batch
-
-    def update(self, idx, error):
-        p = self._getPriority(error)
-        self.tree.update(idx, p)
-
 
 class SumTree:
     write = 0
@@ -146,8 +148,7 @@ class SumTree:
         dataIdx = idx - self.capacity + 1
 
         return (idx, self.tree[idx], self.data[dataIdx])
-
-
+    
 class NormalizedActions(gym.ActionWrapper):
 
     def action(self, action):
@@ -161,69 +162,3 @@ class NormalizedActions(gym.ActionWrapper):
         action /= (self.action_space.high - self.action_space.low)
         action = action * 2 - 1
         return action
-
-
-def fanin_init(size, fanin=None):
-    fanin = fanin or size[0]
-    #v = 1. / np.sqrt(fanin)
-    v = 0.008
-    return torch.Tensor(size).uniform_(-v, v)
-
-
-def to_numpy(var):
-    return var.data.numpy()
-
-
-def to_tensor(ndarray, volatile=False, requires_grad=False):
-    return Variable(torch.from_numpy(ndarray).float(), volatile=volatile, requires_grad=requires_grad)
-
-
-def pickle_obj(filename, object):
-    handle = open(filename, "wb")
-    pickle.dump(object, handle)
-
-
-def unpickle_obj(filename):
-    with open(filename, 'rb') as f:
-        return pickle.load(f)
-
-
-def odict_to_numpy(odict):
-    l = list(odict.values())
-    state = l[0]
-    for i in range(1, len(l)):
-        if isinstance(l[i], np.ndarray):
-            state = np.concatenate((state, l[i]))
-        else: #Floats
-            state = np.concatenate((state, np.array([l[i]])))
-    return state
-
-
-def min_max_normalize(x):
-    min_x = np.min(x)
-    max_x = np.max(x)
-    return (x - min_x) / (max_x - min_x)
-
-
-def is_lnorm_key(key):
-    return key.startswith('lnorm')
-
-class Archive:
-    """A record of past behaviour characterisations (BC) in the population"""
-
-    def __init__(self, args):
-        self.args = args
-        # Past behaviours
-        self.bcs = []
-
-    def add_bc(self, bc):
-        if len(self.bcs) + 1 > self.args.archive_size:
-            self.bcs = self.bcs[1:]
-        self.bcs.append(bc)
-
-    def get_novelty(self, this_bc):
-        if self.size() == 0:
-            return np.array(this_bc).T @ np.array(this_bc)
-        distances = np.ravel(distance.cdist(np.expand_dims(this_bc, axis=0), np.array(self.bcs), metric='sqeuclidean'))
-        distances = np.sort(distances)
-        return distances[:self.args.ns_k].mean()

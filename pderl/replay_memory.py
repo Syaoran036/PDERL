@@ -4,9 +4,6 @@ import numpy as np
 from collections import namedtuple
 from pderl import utils
 
-# Taken and adapted from
-# https://github.com/pytorch/tutorials/blob/master/Reinforcement%20(Q-)Learning%20with%20PyTorch.ipynb
-
 Transition = namedtuple(
     'Transition', ('state', 'action', 'next_state', 'reward', 'done'))
 

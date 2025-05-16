@@ -1,9 +1,0 @@
-cffi
-Cython
-fastrand
-glfw
-gymnasium
-numpy
-pandas
-torch
-torchvision
