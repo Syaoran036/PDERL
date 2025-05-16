@@ -34,12 +34,6 @@ To run PDERL with proximal mutations and distillation-based crossover use:
 python run_pderl.py -env=$ENV_NAME$ -distil -proximal_mut -mut_mag=$MUT_MAG$ -logdir=$LOG_DIR$
 ```
 
-To evaluate and visualise a trained model in an environment use:
-
-```bash
-python play_pderl.py -env=$ENV_NAME$ -model_path=$MODEL_PATH$ -render 
-```
-
 #### ENVS TESTED #### 
 
 'Hopper-v4' \

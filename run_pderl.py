@@ -11,12 +11,6 @@ with open('config.json', 'r') as f:
     config = json.load(f)
 
 parser = argparse.ArgumentParser()
-for arg_name, arg_config in config['cli_args'].items():
-    if 'action' in arg_config:
-        parser.add_argument(f'-{arg_name}', help=arg_config['help'], action=arg_config['action'])
-    else:
-        parser.add_argument(f'-{arg_name}', help=arg_config['help'], type=eval(arg_config['type']), default=arg_config.get('default'))
-
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 if __name__ == "__main__":
