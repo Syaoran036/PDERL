@@ -1,0 +1,263 @@
+{
+    "env": {
+        "help": "Environment Choices: (Swimmer-v2) (HalfCheetah-v2) (Hopper-v2) (Walker2d-v2) (Ant-v2)",
+        "required": true,
+        "type": "str",
+        "default": null
+    },
+    "seed": {
+        "help": "Random seed to be used",
+        "type": "int",
+        "default": 7
+    },
+    "disable_cuda": {
+        "help": "Disables CUDA",
+        "action": "store_true",
+        "default": false
+    },
+    "render": {
+        "help": "Render gym episodes",
+        "action": "store_true",
+        "default": false
+    },
+    "sync_period": {
+        "help": "How often to sync to population",
+        "type": "int",
+        "default": null
+    },
+    "novelty": {
+        "help": "Use novelty exploration",
+        "action": "store_true",
+        "default": false
+    },
+    "proximal_mut": {
+        "help": "Use safe mutation",
+        "action": "store_true",
+        "default": false
+    },
+    "distil": {
+        "help": "Use distilation crossover",
+        "action": "store_true",
+        "default": false
+    },
+    "distil_type": {
+        "help": "Use distilation crossover. Choices: (fitness) (distance)",
+        "type": "str",
+        "default": "fitness"
+    },
+    "per": {
+        "help": "Use Prioritised Experience Replay",
+        "action": "store_true",
+        "default": false
+    },
+    "mut_mag": {
+        "help": "The magnitude of the mutation",
+        "type": "float",
+        "default": 0.05
+    },
+    "mut_noise": {
+        "help": "Use a random mutation magnitude",
+        "action": "store_true",
+        "default": false
+    },
+    "verbose_mut": {
+        "help": "Make mutations verbose",
+        "action": "store_true",
+        "default": false
+    },
+    "verbose_crossover": {
+        "help": "Make crossovers verbose",
+        "action": "store_true",
+        "default": false
+    },
+    "logdir": {
+        "help": "Folder where to save results",
+        "type": "str",
+        "required": true,
+        "default": null
+    },
+    "opstat": {
+        "help": "Store statistics for the variation operators",
+        "action": "store_true",
+        "default": false
+    },
+    "opstat_freq": {
+        "help": "Frequency (in generations) to store operator statistics",
+        "type": "int",
+        "default": 1
+    },
+    "save_periodic": {
+        "help": "Save actor, critic and memory periodically",
+        "action": "store_true",
+        "default": false
+    },
+    "next_save": {
+        "help": "Generation save frequency for save_periodic",
+        "type": "int",
+        "default": 200
+    },
+    "use_ln": {
+        "help": "Whether to use layer normalization",
+        "type": "bool",
+        "default": true
+    },
+    "gamma": {
+        "help": "Discount factor for the reward",
+        "type": "float",
+        "default": 0.99
+    },
+    "tau": {
+        "help": "Soft update factor for target networks",
+        "type": "float",
+        "default": 0.001
+    },
+    "batch_size": {
+        "help": "Batch size for training",
+        "type": "int",
+        "default": 128
+    },
+    "frac_frames_train": {
+        "help": "Fraction of frames used for training",
+        "type": "float",
+        "default": 1.0
+    },
+    "use_done_mask": {
+        "help": "Whether to use done mask in Q-value calculation",
+        "type": "bool",
+        "default": true
+    },
+    "buffer_size": {
+        "help": "Size of the replay buffer",
+        "type": "int",
+        "default": 1000000
+    },
+    "ls": {
+        "help": "Learning start parameter",
+        "type": "int",
+        "default": 128
+    },
+    "replace_old": {
+        "help": "Whether to replace old data in the buffer",
+        "type": "bool",
+        "default": true
+    },
+    "alpha": {
+        "help": "Alpha parameter for prioritized replay",
+        "type": "float",
+        "default": 0.7
+    },
+    "beta_zero": {
+        "help": "Initial beta parameter for prioritized replay",
+        "type": "float",
+        "default": 0.5
+    },
+    "pop_size": {
+        "help": "Population size for evolutionary algorithm",
+        "type": "int",
+        "default": 10
+    },
+    "crossover_prob": {
+        "help": "Crossover probability",
+        "type": "float",
+        "default": 0.0
+    },
+    "mutation_prob": {
+        "help": "Mutation probability",
+        "type": "float",
+        "default": 0.9
+    },
+    "mutation_batch_size": {
+        "help": "Batch size for mutation",
+        "type": "int",
+        "default": 256
+    },
+    "individual_bs": {
+        "help": "Individual buffer size",
+        "type": "int",
+        "default": 8000
+    },
+    "ns_epochs": {
+        "help": "Number of epochs for novelty search",
+        "type": "int",
+        "default": 10
+    },
+    "actor": {
+        "lr": {
+            "help": "Learning rate for the actor network",
+            "type": "float",
+            "default": 0.5e-4
+        },
+        "transformer_dim": {
+            "help": "Transformer dimension for the actor network",
+            "type": "int",
+            "default": 128
+        },
+        "num_heads": {
+            "help": "Number of heads in the transformer for the actor network",
+            "type": "int",
+            "default": 4
+        },
+        "ff_dim": {
+            "help": "Feed-forward dimension in the transformer for the actor network",
+            "type": "int",
+            "default": 512
+        },
+        "num_layers": {
+            "help": "Number of layers in the transformer for the actor network",
+            "type": "int",
+            "default": 2
+        },
+        "dropout": {
+            "help": "Dropout rate for the actor network",
+            "type": "float",
+            "default": 0.1
+        }
+    },
+    "critic": {
+        "lr": {
+            "help": "Learning rate for the critic network",
+            "type": "float",
+            "default": 0.5e-3
+        },
+        "transformer_dim": {
+            "help": "Transformer dimension for the critic network",
+            "type": "int",
+            "default": 128
+        },
+        "num_heads": {
+            "help": "Number of heads in the transformer for the critic network",
+            "type": "int",
+            "default": 4
+        },
+        "ff_dim": {
+            "help": "Feed-forward dimension in the transformer for the critic network",
+            "type": "int",
+            "default": 512
+        },
+        "num_layers": {
+            "help": "Number of layers in the transformer for the critic network",
+            "type": "int",
+            "default": 2
+        },
+        "dropout": {
+            "help": "Dropout rate for the critic network",
+            "type": "float",
+            "default": 0.1
+        }
+    },
+    "ff_dim": {
+        "help": "General feed-forward dimension",
+        "type": "int",
+        "default": 512
+    },
+    "num_layers": {
+        "help": "General number of layers",
+        "type": "int",
+        "default": 2
+    },
+    "dropout": {
+        "help": "General dropout rate",
+        "type": "float",
+        "default": 0.1
+    }
+}
