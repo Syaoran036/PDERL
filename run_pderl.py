@@ -2,7 +2,7 @@ import numpy as np, os, time, random
 from pderl import utils, agents
 import gymnasium as gym, torch
 import pickle
-import json
+import yaml
 
 from pderl.parameters import Parameters
 from pderl.agents import GeneticAgent
@@ -175,8 +175,8 @@ class PDERL:
 
 
 # 读取配置文件
-with open('config.json', 'r') as f:
-    config = json.load(f)
+with open('config.yaml', 'r') as f:
+    config = yaml.safe_load(f)
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 

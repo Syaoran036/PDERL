@@ -1,0 +1,109 @@
+# Actor 网络相关配置
+actor:
+  # 丢弃率，用于防止过拟合
+  dropout: 0.1
+  # 前馈网络维度
+  ff_dim: 512
+  # 学习率
+  lr: 5e-05
+  # 多头注意力机制中的头数
+  num_heads: 4
+  # 网络层数
+  num_layers: 2
+  # Transformer 模型的维度
+  transformer_dim: 128
+
+# PER（Prioritized Experience Replay）中的优先级指数
+alpha: 0.7
+# 训练时的批次大小
+batch_size: 128
+# PER 中的初始重要性采样权重
+beta_zero: 0.5
+# 经验回放缓冲区的大小
+buffer_size: 1000000
+
+# Critic 网络相关配置
+critic:
+  # 丢弃率，用于防止过拟合
+  dropout: 0.1
+  # 前馈网络维度
+  ff_dim: 512
+  # 学习率
+  lr: 0.0005
+  # 多头注意力机制中的头数
+  num_heads: 4
+  # 网络层数
+  num_layers: 2
+  # Transformer 模型的维度
+  transformer_dim: 128
+
+# 交叉概率
+crossover_prob: 0.0
+# 是否禁用 CUDA 加速
+disable_cuda: false
+# 是否启用蒸馏学习
+distil: false
+# 蒸馏学习的类型
+distil_type: fitness
+# 全局丢弃率
+dropout: 0.1
+# 使用的环境名称
+env: Hopper-v5
+# 全局前馈网络维度
+ff_dim: 512
+# 用于训练的帧数比例
+frac_frames_train: 1.0
+# 折扣因子
+gamma: 0.99
+# 每个个体的经验数量
+individual_bs: 8000
+# 日志文件存储目录
+logdir: logs
+# 隐藏层大小
+ls: 128
+# 突变批次大小
+mutation_batch_size: 256
+# 突变概率
+mutation_prob: 0.9
+# 突变幅度
+mut_mag: 0.05
+# 是否添加突变噪声
+mut_noise: false
+# 下一次保存模型的游戏次数间隔
+next_save: 200
+# 是否启用新奇性搜索
+novelty: false
+# 新奇性搜索的训练轮数
+ns_epochs: 10
+# 全局网络层数
+num_layers: 2
+# 是否启用操作统计
+opstat: false
+# 操作统计的频率
+opstat_freq: 1
+# 是否启用优先经验回放
+per: false
+# 种群大小
+pop_size: 10
+# 是否启用近端突变
+proximal_mut: false
+# 是否渲染环境
+render: false
+# 是否替换旧的模型
+replace_old: true
+# 是否定期保存模型
+save_periodic: false
+# 随机种子
+seed: 7
+# 同步周期
+sync_period: null
+# 软更新参数
+tau: 0.001
+# 是否使用终止掩码
+use_done_mask: true
+# 是否使用层归一化
+use_ln: true
+# 是否打印交叉操作的详细信息
+verbose_crossover: false
+# 是否打印突变操作的详细信息
+verbose_mut: false
